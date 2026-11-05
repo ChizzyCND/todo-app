@@ -18,15 +18,93 @@
       </header>
 
       <form id="task-form">
-        <input
-          type="text"
-          id="task-input"
-          placeholder="What do you need to do?"
-          aria-label="New task"
-          required
-        />
-        <button type="submit">Add</button>
+        <div class="form-row">
+          <input
+            type="text"
+            id="task-input"
+            placeholder="What do you need to do?"
+            aria-label="New task"
+            required
+          />
+          <button type="submit">Add</button>
+        </div>
+        <div class="form-row options">
+          <label
+            >Deadline
+            <input type="date" id="due-input" />
+          </label>
+          <label
+            >Priority
+            <select id="priority-input">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label
+            >Category
+            <input
+              type="text"
+              id="category-input"
+              list="category-list"
+              placeholder="e.g. Work"
+            />
+          </label>
+          <datalist id="category-list"></datalist>
+        </div>
       </form>
+
+      <section id="filters" aria-label="Filter tasks">
+        <div class="chips" id="status-filter" role="group" aria-label="Status">
+          <button
+            type="button"
+            class="chip"
+            data-status="all"
+            aria-pressed="true"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="chip"
+            data-status="active"
+            aria-pressed="false"
+          >
+            Active
+          </button>
+          <button
+            type="button"
+            class="chip"
+            data-status="done"
+            aria-pressed="false"
+          >
+            Completed
+          </button>
+        </div>
+        <div class="filter-row">
+          <select id="filter-priority" aria-label="Filter by priority">
+            <option value="">Any priority</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select id="filter-category" aria-label="Filter by category">
+            <option value="">All categories</option>
+          </select>
+          <select id="filter-due" aria-label="Filter by deadline">
+            <option value="">Any deadline</option>
+            <option value="overdue">Overdue</option>
+            <option value="today">Due today</option>
+            <option value="week">Next 7 days</option>
+            <option value="none">No deadline</option>
+          </select>
+          <select id="sort-by" aria-label="Sort tasks">
+            <option value="due">Sort: deadline</option>
+            <option value="priority">Sort: priority</option>
+            <option value="newest">Sort: newest</option>
+          </select>
+        </div>
+      </section>
 
       <ul id="task-list"></ul>
 
