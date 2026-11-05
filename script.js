@@ -5,32 +5,55 @@ const list = document.querySelector("#task-list");
 const emptyMessage = document.querySelector("#empty-message");
 const taskCount = document.querySelector("#task-count");
 const clearDoneButton = document.querySelector("#clear-done");
+const todayDate = document.querySelector("#today-date");
+const progressBar = document.querySelector("#progress-bar");
+const progressText = document.querySelector("#progress-text");
 
-// 2. Load saved tasks (or start with an empty list)
+// 2. Show today's date, for example "Thursday 5 November"
+todayDate.textContent = new Date().toLocaleDateString("en-GB", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
+// 3. Load saved tasks (or start with an empty list)
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// 3. Save the tasks in the browser
+// 4. Save the tasks in the browser
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// 4. Update the counter and the empty message
+// 5. Update the counter, progress bar and empty message
 function updateInfo() {
+  const total = tasks.length;
   const remaining = tasks.filter((task) => !task.done).length;
+  const completed = total - remaining;
+  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   taskCount.textContent =
     remaining === 1 ? "1 task left" : `${remaining} tasks left`;
 
-  emptyMessage.hidden = tasks.length > 0;
+  progressBar.style.width = `${percent}%`;
+  progressText.textContent =
+    total === 0 ? "" : `${completed} of ${total} completed`;
+
+  emptyMessage.hidden = total > 0;
 }
 
-// 5. Show all the tasks on the page
+// 6. Show all the tasks on the page
 function renderTasks() {
   list.innerHTML = "";
 
   tasks.forEach((task, index) => {
     const item = document.createElement("li");
     if (task.done) item.classList.add("done");
+
+    // The tick box
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.done;
+    checkbox.setAttribute("aria-label", `Mark as done: ${task.text}`);
 
     const label = document.createElement("span");
     label.textContent = task.text;
@@ -40,7 +63,14 @@ function renderTasks() {
     deleteButton.className = "delete-btn";
     deleteButton.setAttribute("aria-label", `Delete task: ${task.text}`);
 
-    // Click the text: mark as done / not done
+    // Tick or untick the box: mark as done / not done
+    checkbox.addEventListener("change", () => {
+      task.done = checkbox.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    // Clicking the text does the same thing
     label.addEventListener("click", () => {
       task.done = !task.done;
       saveTasks();
@@ -54,6 +84,7 @@ function renderTasks() {
       renderTasks();
     });
 
+    item.appendChild(checkbox);
     item.appendChild(label);
     item.appendChild(deleteButton);
     list.appendChild(item);
@@ -62,7 +93,7 @@ function renderTasks() {
   updateInfo();
 }
 
-// 6. When the form is submitted, add a new task
+// 7. When the form is submitted, add a new task
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -77,12 +108,12 @@ form.addEventListener("submit", (event) => {
   input.focus();
 });
 
-// 7. "Clear completed" removes every task that is done
+// 8. "Clear completed" removes every ticked task
 clearDoneButton.addEventListener("click", () => {
   tasks = tasks.filter((task) => !task.done);
   saveTasks();
   renderTasks();
 });
 
-// 8. Show the saved tasks when the page opens
+// 9. Show the saved tasks when the page opens
 renderTasks();
